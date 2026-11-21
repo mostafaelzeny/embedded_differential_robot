@@ -81,11 +81,6 @@ void Encoder_ResetRight(void);
  */
 void Encoder_GetDelta(int32_t *left_delta, int32_t *right_delta);
 
-/* Interrupt handlers (called from stm32f1xx_it.c) */
-void Encoder_EXTI1_Handler(void);   /* Left A */
-void Encoder_EXTI2_Handler(void);   /* Left B */
-void Encoder_EXTI9_5_Handler(void); /* Right A/B (EXTI8, EXTI9) */
-
 #ifdef __cplusplus
 }
 #endif

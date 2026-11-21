@@ -210,16 +210,31 @@ void Encoder_GetDelta(int32_t *left_delta, int32_t *right_delta) {
 /* ================ Interrupt Handlers ================ */
 
 /**
- * @brief  EXTI1 handler (Left Encoder A - PA1)
+ * @brief  EXTI1 ISR (Left Encoder A - PA1)
  */
-void Encoder_EXTI1_Handler(void) { ProcessLeftEncoder(); }
+void EXTI1_IRQHandler(void) {
+  if (READ_BIT(EXTI->PR, EXTI_PR_PR1)) {
+    WRITE_REG(EXTI->PR, EXTI_PR_PR1);
+    ProcessLeftEncoder();
+  }
+}
 
 /**
- * @brief  EXTI2 handler (Left Encoder B - PA2)
+ * @brief  EXTI2 ISR (Left Encoder B - PA2)
  */
-void Encoder_EXTI2_Handler(void) { ProcessLeftEncoder(); }
+void EXTI2_IRQHandler(void) {
+  if (READ_BIT(EXTI->PR, EXTI_PR_PR2)) {
+    WRITE_REG(EXTI->PR, EXTI_PR_PR2);
+    ProcessLeftEncoder();
+  }
+}
 
 /**
- * @brief  EXTI9_5 handler (Right Encoder A/B - PB8/PB9)
+ * @brief  EXTI9_5 ISR (Right Encoder A/B - PB8/PB9)
  */
-void Encoder_EXTI9_5_Handler(void) { ProcessRightEncoder(); }
+void EXTI9_5_IRQHandler(void) {
+  if (READ_BIT(EXTI->PR, EXTI_PR_PR8 | EXTI_PR_PR9)) {
+    WRITE_REG(EXTI->PR, EXTI_PR_PR8 | EXTI_PR_PR9);
+    ProcessRightEncoder();
+  }
+}
