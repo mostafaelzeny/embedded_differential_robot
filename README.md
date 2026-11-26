@@ -10,7 +10,7 @@ A bare-metal / CMSIS C firmware project for an **STM32F103C8T6 (Blue Pill)** dif
 - **Motor Control (`motor.c`):** Dual DC motors driven by **TIM3 PWM** (1 kHz, 0–1000 resolution) + GPIO direction pins.
 - **Wheel Encoders (`encoder.c`):** Quadrature decoding on **EXTI** interrupts (`EXTI1`, `EXTI2`, `EXTI9_5`) to measure speed and count ticks.
 - **IMU & Straight-Line PID (`imu.c`, `pid.c`, `differential_drive.c`):** Reads yaw rate from an **MPU6050** over **I2C1** (100 kHz), calibrates gyro bias on startup, and runs a **100 Hz** loop combining two **Speed PIDs** (left/right wheels) with a **Heading PID** to keep the robot straight.
-- **Automated HIL Testing (`uart.c`, `tests/test_uart.py`):** Exposes a simple **USART1 (115200 baud)** command interface so a PC running `pytest` + `pyserial` can test real MCU responsiveness and encoder reads automatically.
+- **Automated HIL Testing (`uart.c`, `tests/`):** Exposes a simple **USART1 (115200 baud)** command interface so a PC running `pytest` + `pyserial` can test real MCU responsiveness and encoder reads automatically.
 
 ---
 
@@ -34,7 +34,8 @@ A bare-metal / CMSIS C firmware project for an **STM32F103C8T6 (Blue Pill)** dif
 │       ├── pid.c                  # PID with anti-windup & derivative-on-measurement
 │       └── uart.c                 # Non-blocking USART1 command parser (PING, ENC?)
 ├── tests/
-│   └── test_uart.py               # Automated pytest + PySerial HIL tests
+│   ├── test_ping.py               # Automated PING -> PONG UART test
+│   └── test_encoder.py            # Automated ENC? encoder count test
 ├── requirements.txt               # Python test dependencies
 └── embedded_differential_robot.ioc
 ```
@@ -75,7 +76,6 @@ Build and flash using **STM32CubeIDE**.
 |---|---|---|
 | `PING` | `PONG` | Serial wiring, baud rate, and MCU responsiveness |
 | `ENC?` | `ENC L=<int> R=<int>` | Live left/right encoder peripheral integration |
-| *(unknown)* | `ERR` | Graceful error handling without locking up |
 
 ### Run the Tests
 
@@ -98,5 +98,5 @@ STM32_PORT=/dev/ttyUSB0 python3 -m pytest -v
 
 ### Automated vs. Manual Checks
 
-- **Automated (`tests/test_uart.py`):** Verifies `PING` → `PONG` (single and 5× repeated), `ENC?` response format and valid `int32_t` counts, and `ERR` on invalid commands.
+- **Automated (`tests/test_ping.py`, `tests/test_encoder.py`):** Verifies `PING` → `PONG` and `ENC?` → `ENC L=<int> R=<int>`.
 - **Manual:** Verify 3.3 V UART wiring, confirm motors stay stopped in test mode, and spin each wheel by hand between `ENC?` reads to confirm encoder counts change in the expected direction.
